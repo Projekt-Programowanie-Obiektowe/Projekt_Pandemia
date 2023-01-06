@@ -1,6 +1,9 @@
 # Projekt_Pandemia
 
-Symulacja Pandemii.
+Symulacja Pandemii
+...
+...
+...
 
 Autorzy: 
  Maja Leczkowska,
