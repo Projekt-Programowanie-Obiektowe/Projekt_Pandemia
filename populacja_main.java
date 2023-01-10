@@ -1,6 +1,4 @@
-package projekt_pandemia;
 import java.lang.Thread;
-import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -8,25 +6,25 @@ public class populacja_main {
     public static void main(String[] args){
 
 
-        int liczba_symulacji = 2;
+        int liczba_symulacji = 1;
 
 
-        double p1 = 0.75; //prawdopodobienstwo zarazenia czlowieka od czlowieka (odleglosc)
-        double p2 = 0.8; //prawdopodobienstwo zarazenia zwierzecia od zwierzecia (odleglosc)
-        double p3 = 0.25; //prawdopobienstwo ze czlowiek umie wybrac zdrowe zwierze
+        double p1 = 0.4; //prawdopodobienstwo zarazenia czlowieka od czlowieka (odleglosc)
+        double p2 = 0.6; //prawdopodobienstwo zarazenia zwierzecia od zwierzecia (odleglosc)
+        double p3 = 0.75; //prawdopobienstwo ze czlowiek umie wybrac zdrowe zwierze
         boolean K = true;  //kwarantanna
-        int odleglosc = 10;
-        int odleglosc_zwierzeta = 15;
+        int odleglosc = 5;
+        int odleglosc_zwierzeta = 10;
 
-        int ile_ludzi = 200;
-        int ile_zwierzat = 3000;
+        int ile_ludzi = 130;
+        int ile_zwierzat = 5000;
 
         int iteracje = 700;
-        int sukces = 0;
+        int sukces;
 
 
-        populacja test = new populacja(ile_ludzi,ile_zwierzat);
-
+        populacja test = new populacja();
+        
         int var;  //dzieki tej zmiennej mozemy wyjsc z ogolnej petli
         int przebieg;  //liczba iteracji ktore sie wykonuje
 
@@ -34,7 +32,7 @@ public class populacja_main {
         float suma_dlugosc_trwania = 0;  //koniec epidemii
         float suma_nr_iteracji_pik = 0;   //suma iteracji gdzie najwiecej chorych
         int nr_iteracji_pik;
-        int pik_chorych;    //najwieksza liczba chorych w symulacji
+        int pik_chorych = 0;    //najwieksza liczba chorych w symulacji
 
         test.kwarantanna = K;
 
@@ -43,6 +41,7 @@ public class populacja_main {
 
         for(int s = 0; s < liczba_symulacji; s++) {
 
+        	        	        	
             var = 0;
             przebieg = 0;
             sukces = 0;
@@ -50,8 +49,7 @@ public class populacja_main {
             pik_chorych = 0;   //dla kazdej nowej symulacji trzeba wyzerowac
 
             test = new populacja(ile_ludzi,ile_zwierzat);
-
-
+            
             while (var >= 0) {
 
                 //ponizej w kazdej iteracji sprawdzam odleglosc miedzy kazdymi dwoma ludzmi, jak jeden chory - drugi sie zaraza
@@ -62,48 +60,52 @@ public class populacja_main {
                         czlowiek obiekt_j = test.lista_ludzi.get(j);
                         czlowiek obiekt_k = test.lista_ludzi.get(k);        //tworzymy te obiekty zeby moc operowac nimi i listami w petlach
 
-
-                        if (obiekt_j.odleglosc(obiekt_k) < odleglosc) {
-
-
-                            if (obiekt_j.stan == 1) {
+                        if(obiekt_j.stan != 3 && obiekt_k.stan != 3) {
 
 
-                                Random r = new Random();
-                                double a = r.nextDouble(); // losowa liczba od 0 do 1
+                            if (obiekt_j.odleglosc(obiekt_k) < odleglosc) {
 
-                                if (a <= p1) {  //z prawdopodobienstwem p1
 
-                                    if (obiekt_k.stan != 1) {
+                                if (obiekt_j.stan == 1) {
 
-                                        obiekt_k.zmiana_stanu(1);
-                                        obiekt_k.rokowania_choroby();
 
-                                        test.lista_ludzi.set(k, obiekt_k);
+                                    Random r = new Random();
+                                    double a = r.nextDouble(); // losowa liczba od 0 do 1
 
-                                        test.liczba_ludzi_chorych++;
+                                    if (a <= p1) {  //z prawdopodobienstwem p1
+
+                                        if (obiekt_k.stan != 1) {
+
+                                            obiekt_k.zmiana_stanu(1);
+                                            obiekt_k.rokowania_choroby();
+
+                                            test.lista_ludzi.set(k, obiekt_k);
+
+                                            test.liczba_ludzi_chorych++;
+                                        }
                                     }
-                                }
-                            } else if (obiekt_k.stan == 1) {
+                                } else if (obiekt_k.stan == 1) {
 
-                                Random r = new Random();
-                                double a = r.nextDouble();
+                                    Random r = new Random();
+                                    double a = r.nextDouble();
 
-                                if (a <= p1) {
+                                    if (a <= p1) {
 
-                                    if (obiekt_j.stan != 1) {
-                                        obiekt_j.zmiana_stanu(1);
-                                        obiekt_j.rokowania_choroby();
+                                        if (obiekt_j.stan != 1) {
+                                            obiekt_j.zmiana_stanu(1);
+                                            obiekt_j.rokowania_choroby();
 
-                                        test.lista_ludzi.set(j, obiekt_j);
+                                            test.lista_ludzi.set(j, obiekt_j);
 
-                                        test.liczba_ludzi_chorych++;
+                                            test.liczba_ludzi_chorych++;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+
 
                 //ponizej w kazdej iteracji sprawdzam odleglosc miedzy kazdymi dwoma zwierzetami, jak jeden chory - drugi sie zaraza
                 for (int z = 0; z < test.z; z++) {
@@ -113,41 +115,43 @@ public class populacja_main {
                         zwierze obiekt_z = test.lista_zwierzat.get(z);
                         zwierze obiekt_w = test.lista_zwierzat.get(w);
 
+                        if(obiekt_z.stan != 3 && obiekt_w.stan != 3) {
 
-                        if (obiekt_z.odleglosc(obiekt_w) < odleglosc_zwierzeta) {
+                            if (obiekt_z.odleglosc(obiekt_w) < odleglosc_zwierzeta) {
 
 
-                            if (obiekt_z.stan == 1) {
+                                if (obiekt_z.stan == 1) {
 
-                                Random r = new Random();
-                                double a = r.nextDouble();
+                                    Random r = new Random();
+                                    double a = r.nextDouble();
 
-                                if (a <= p2) {  //z prawdopodobienstwem p2
+                                    if (a <= p2) {  //z prawdopodobienstwem p2
 
-                                    if (obiekt_w.stan != 1) {
-                                        obiekt_w.zmiana_stanu(1);
-                                        obiekt_w.rokowania_choroby();
+                                        if (obiekt_w.stan != 1) {
+                                            obiekt_w.zmiana_stanu(1);
+                                            obiekt_w.rokowania_choroby();
 
-                                        test.lista_zwierzat.set(w, obiekt_w);
+                                            test.lista_zwierzat.set(w, obiekt_w);
 
-                                        test.liczba_zwierzat_chorych++;
+                                            test.liczba_zwierzat_chorych++;
+                                        }
                                     }
-                                }
 
-                            } else if (obiekt_w.stan == 1) {
+                                } else if (obiekt_w.stan == 1) {
 
-                                Random r = new Random();
-                                double a = r.nextDouble();
+                                    Random r = new Random();
+                                    double a = r.nextDouble();
 
-                                if (a <= p2) {
+                                    if (a <= p2) {
 
-                                    if (obiekt_z.stan != 1) {
-                                        obiekt_z.zmiana_stanu(1);
-                                        obiekt_z.rokowania_choroby();
+                                        if (obiekt_z.stan != 1) {
+                                            obiekt_z.zmiana_stanu(1);
+                                            obiekt_z.rokowania_choroby();
 
-                                        test.lista_zwierzat.set(z, obiekt_z);
+                                            test.lista_zwierzat.set(z, obiekt_z);
 
-                                        test.liczba_zwierzat_chorych++;
+                                            test.liczba_zwierzat_chorych++;
+                                        }
                                     }
                                 }
                             }
@@ -156,16 +160,19 @@ public class populacja_main {
                 }
 
 
-                int zz = test.l / 5; // to samo co floor(test.l/5)
+                int zz = test.liczba_ludzi_zyjacych / 5; // to samo co floor(test.l/5)
 
-                if (test.l > 0 && test.l < 5) zz = 1;
+                if (test.liczba_ludzi_zyjacych > 0 && test.liczba_ludzi_zyjacych < 5) zz = 1;
 
                 for (int j = 0; j < zz; j++) {   //zjadanie zwierzat przez ludzi
 
-                    if (test.z > 0) {  //zeby mialo sens
+                    if (test.liczba_zwierzat_zyjacych > 0) {  //zeby mialo sens
 
                         int losowy_czlowiek_indeks = test.losowy_czlowiek_indeks();
                         int losowe_zwierze_indeks = test.losowe_zwierze_indeks();
+
+                        zwierze obiekt_zwierze = new zwierze();
+                        czlowiek obiekt = test.lista_ludzi.get(losowy_czlowiek_indeks);
 
 
                         Random r = new Random();
@@ -175,12 +182,20 @@ public class populacja_main {
 
                             int q = 0;
                             while (q < test.z) {
-                                if (test.lista_zwierzat.get(q).stan != 1) {    //pierwsze niechore zwierze
-                                    test.usun_zwierze(q);
+                                if (test.lista_zwierzat.get(q).stan == 0 || test.lista_zwierzat.get(q).stan == 2) {    //pierwsze niechore zwierze
+
+                                    test.liczba_zwierzat_zmarlych++;
+                                    test.liczba_zwierzat_zyjacych--;
+
+                                    if (test.lista_zwierzat.get(q).stan == 2) test.liczba_zwierzat_ozdrowionych--;
+
+                                    obiekt_zwierze = test.lista_zwierzat.get(q);
+                                    obiekt_zwierze.zmiana_stanu(3);
+                                    test.lista_zwierzat.set(q, obiekt_zwierze);
+
                                     q = test.z;
                                 }
                                 q++;
-
                             }
 
 
@@ -189,22 +204,35 @@ public class populacja_main {
 
                             if (test.lista_zwierzat.get(losowe_zwierze_indeks).stan == 1) {  // jak zwierze chore, to sie zaraza
 
-                                czlowiek obiekt = test.lista_ludzi.get(losowy_czlowiek_indeks);
 
                                 if (obiekt.stan != 1) {
 
+                                    if (obiekt.stan == 2) test.liczba_ozdrowiencow--;
+
                                     obiekt.zmiana_stanu(1);
+                                    test.liczba_ludzi_chorych++;
+
                                     obiekt.rokowania_choroby();
 
                                     test.lista_ludzi.set(losowy_czlowiek_indeks, obiekt);
 
-                                    test.liczba_ludzi_chorych++;
                                 }
 
                                 test.liczba_zwierzat_chorych--;
+
                             }
 
-                            test.usun_zwierze(losowe_zwierze_indeks);  // usuwamy zwierze o wylosowanym indeksie z listy zwierzat
+                            test.liczba_zwierzat_zmarlych++;
+
+
+                            obiekt_zwierze = test.lista_zwierzat.get(losowe_zwierze_indeks);
+
+                            if(obiekt_zwierze.stan == 2) test.liczba_zwierzat_ozdrowionych--;
+
+                            obiekt_zwierze.zmiana_stanu(3);
+                            test.lista_zwierzat.set(losowe_zwierze_indeks, obiekt_zwierze);
+                            test.liczba_zwierzat_zyjacych--;
+
                         }
                     }
                 }
@@ -214,30 +242,35 @@ public class populacja_main {
 
                     czlowiek obiekt = test.lista_ludzi.get(i);
 
-                    if (obiekt.stan == 1) {  //jesli czlowiek chory to wchodzi dalej
+                    if(obiekt.stan != 3) {
 
-                        if (obiekt.czas_choroby >= obiekt.przewidywany_czas_choroby) {  //minal czas choroby, wiec albo wyzdrowieje albo umrze
+                        if (obiekt.stan == 1) {  //jesli czlowiek chory to wchodzi dalej
 
-                            double a = new Random().nextDouble();
-                            if (a <= obiekt.prawd_zgonu) {
+                            if (obiekt.czas_choroby >= obiekt.przewidywany_czas_choroby) {  //minal czas choroby, wiec albo wyzdrowieje albo umrze
 
-                                obiekt.zmiana_stanu(3);
+                                double a = new Random().nextDouble();
+                                if (a <= obiekt.prawd_zgonu) {
 
-                                test.usun_czlowieka(i);
-                                test.liczba_ludzi_chorych--;
+                                    obiekt.zmiana_stanu(3);
 
-                            } else {
+                                    test.liczba_ludzi_zmarlych++;
+                                    test.liczba_ludzi_chorych--;
+                                    test.liczba_ludzi_zyjacych--; 
 
-                                obiekt.zmiana_stanu(2);
-                                obiekt.czas_choroby = 0;   //zeruje czas chorowania
-                                test.lista_ludzi.set(i, obiekt);
+                                } else {
 
-                                test.liczba_ludzi_chorych--;
-                            }
+                                    obiekt.zmiana_stanu(2);
+                                    test.liczba_ozdrowiencow++;
 
-                        } else {
-                            obiekt.czas_choroby++;
+                                    obiekt.czas_choroby = 0;   //zeruje czas chorowania;
+
+                                    test.liczba_ludzi_chorych--;
+                                }
+
+                            } else obiekt.czas_choroby++;
+
                             test.lista_ludzi.set(i, obiekt);
+
                         }
                     }
                 }
@@ -247,30 +280,37 @@ public class populacja_main {
 
                     zwierze obiekt2 = test.lista_zwierzat.get(i);
 
-                    if (obiekt2.stan == 1) {
+                    if(obiekt2.stan != 3) {
 
-                        if (obiekt2.czas_choroby >= obiekt2.przewidywany_czas_choroby) {  //minal czas choroby, wiec albo wyzdrowieje albo umrze
+                        if (obiekt2.stan == 1) {
 
-                            double a = new Random().nextDouble();
-                            if (a <= obiekt2.prawd_zgonu) {
+                            if (obiekt2.czas_choroby >= obiekt2.przewidywany_czas_choroby) {  //minal czas choroby, wiec albo wyzdrowieje albo umrze
 
-                                obiekt2.zmiana_stanu(3);
+                                double a = new Random().nextDouble();
+                                if (a <= obiekt2.prawd_zgonu) {
 
-                                test.usun_zwierze(i);
-                                test.liczba_zwierzat_chorych--;
+                                    obiekt2.zmiana_stanu(3);
 
-                            } else {
+                                    test.liczba_zwierzat_zmarlych++;
+                                    test.liczba_zwierzat_chorych--;
+                                    test.liczba_zwierzat_zyjacych--;
 
-                                obiekt2.zmiana_stanu(2);
-                                obiekt2.czas_choroby = 0;
-                                test.lista_zwierzat.set(i, obiekt2);
+                                } else {
 
-                                test.liczba_zwierzat_chorych--;
-                            }
+                                    obiekt2.zmiana_stanu(2);
+                                    test.liczba_zwierzat_ozdrowionych++;
 
-                        } else {
-                            obiekt2.czas_choroby++;
+                                    obiekt2.czas_choroby = 0;
+
+
+                                    test.liczba_zwierzat_chorych--;
+                                }
+
+                            } else obiekt2.czas_choroby++;
+
                             test.lista_zwierzat.set(i, obiekt2);
+                          
+
                         }
                     }
                 }
@@ -287,13 +327,13 @@ public class populacja_main {
                     Thread.currentThread().interrupt();
                 }
 
-
-                if (test.l > 0 && test.liczba_ludzi_chorych == 0 && test.liczba_zwierzat_chorych == 0) {  //wszyscy zdrowi i sa ludzie
+                if (przebieg == iteracje) var = -1; //wykonano wszystkie iteracje
+                if (test.l - test.liczba_ludzi_zmarlych > 0 && test.liczba_ludzi_chorych == 0 && test.liczba_zwierzat_chorych == 0) {  //pozostali sami zdrowi 
                     sukces = 1;
                     var = -1;
-                } else if (test.l == 0) var = -1;   // nie ma juz zadnego czlowieka
-                else if (przebieg == iteracje) var = -1; //wykonano wszystkie iteracje
-
+                } 
+                if (test.l == test.liczba_ludzi_zmarlych) var = -1;   // wszyscy ludzie sa zmarli
+                
 
 
                 if(test.liczba_ludzi_chorych > pik_chorych) {  //gdy liczba chorych jest wieksza niz aktualny pik, to zamien
@@ -304,26 +344,25 @@ public class populacja_main {
 
 
 
-        //        System.out.print("Nr iteracji: " + przebieg + ", chorzy ludzie/wszyscy ludzie: " + test.liczba_ludzi_chorych + "/" + test.l +
-        //                ", chore zwierzeta/wszystkie zwierzeta: " + test.liczba_zwierzat_chorych + "/" + test.z);
+                System.out.format("Nr iteracji: %4d     Ludzie chorzy: %5d  Ludzie zdrowi: %5d      Zwierzęta chore: %5d    Zwierzęta zdrowe: %5d",
+                        przebieg, test.liczba_ludzi_chorych, (test.liczba_ludzi_zyjacych - test.liczba_ludzi_chorych),
+                        test.liczba_zwierzat_chorych, (test.liczba_zwierzat_zyjacych - test.liczba_zwierzat_chorych));
 
 
-    ///*
+            //    for(int m = 0; m < test.l; m++){
+            //        System.out.print(test.lista_ludzi.get(m).stan);
+            //    }
 
-                System.out.print("Nr iteracji: " + przebieg + "  ");
 
-                for(int m = 0; m < test.l; m++){
-                    System.out.print(test.lista_ludzi.get(m).stan);
-                }
+               System.out.println();
 
-    //*/
 
-                System.out.println();
 
             }
 
-
+            System.out.println();
             System.out.println("Liczba iteracji: " + przebieg + ", sukces: " + sukces);
+            System.out.println("Największa liczba chorych (pik): " + pik_chorych  + " w " + nr_iteracji_pik + "-ej iteracji");
 
 
             suma_dlugosc_trwania += przebieg;
@@ -332,7 +371,7 @@ public class populacja_main {
 
 
             System.out.println();
-            System.out.println("******************************************************************************************************");
+            System.out.println("***************************************************************************************************************");
             System.out.println();
 
         }
@@ -343,8 +382,8 @@ public class populacja_main {
         float srednia_dlugosc_trwania = suma_dlugosc_trwania / liczba_symulacji;
 
 
-        System.out.println("Średnia długość trwania epidemii z " + liczba_symulacji + " symulacji to: " + srednia_dlugosc_trwania);
-        System.out.println("Średnia liczba iteracji z " + liczba_symulacji + " symulacji w której wystąpił 'pik' zachorowań: " + sredni_nr_iteracji_pik);
+        System.out.format("Średnia długość trwania epidemii z %d symulacji to: %10.2f\n", liczba_symulacji, srednia_dlugosc_trwania);
+        System.out.format("Średni numer iteracji z %d symulacji, w której wystąpił 'pik' zachorowań: %10.2f\n", liczba_symulacji, sredni_nr_iteracji_pik);
 
     }
 }

@@ -1,4 +1,3 @@
-package projekt_pandemia;
 import java.util.Random;
 
 public class czlowiek extends zwierze {
@@ -13,7 +12,7 @@ public class czlowiek extends zwierze {
         double z;
 
         do{
-            z = new Random().nextGaussian() * 0.40 + 0.15;
+            z = new Random().nextGaussian() * 0.25 + 0.15;
 
         }while(0 > z || z > 1);
 

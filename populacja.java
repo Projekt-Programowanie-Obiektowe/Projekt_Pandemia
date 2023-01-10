@@ -1,23 +1,28 @@
-package projekt_pandemia;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class populacja{
 
-    int l = 100; // liczba ludzi
-    int z = 1; // liczba zwierzat
+    int l=10; // liczba ludzi
+    int z=100; // liczba zwierzat
 
     boolean kwarantanna = true;
 
-    int liczba_ludzi_chorych;
-    int liczba_zwierzat_chorych;
+    int liczba_ludzi_chorych = 0;
+    int liczba_ludzi_zmarlych = 0;
+    int liczba_ozdrowiencow = 0;
+    int liczba_ludzi_zyjacych = 0;
+
+    int liczba_zwierzat_chorych = 0;
+    int liczba_zwierzat_zmarlych = 0;
+    int liczba_zwierzat_ozdrowionych= 0;
+    int liczba_zwierzat_zyjacych = 0;
 
     ArrayList<czlowiek> lista_ludzi = new ArrayList<czlowiek>();  //lista ktora zmienia swoja dlugosc
     ArrayList<zwierze> lista_zwierzat = new ArrayList<zwierze>();
 
 
     populacja(){
-
 
         for(int i = 0; i < l; i++){
 
@@ -44,10 +49,12 @@ public class populacja{
         lista_ludzi.set(a, pierwszy);
 
         liczba_ludzi_chorych = 1;
+        liczba_ludzi_zyjacych = l;
+        
 
 
         Random r2 = new Random();   // tutaj losujemy jednego chorego zwierzaczka
-        int b = r.nextInt(z);
+        int b = r2.nextInt(z);
 
         zwierze pierwsze = new zwierze();
         pierwsze = lista_zwierzat.get(b);
@@ -60,7 +67,7 @@ public class populacja{
         lista_zwierzat.set(b, pierwsze);
 
         liczba_zwierzat_chorych = 1;
-
+        liczba_zwierzat_zyjacych = z;
     }
 
 
@@ -68,6 +75,7 @@ public class populacja{
 
         l = ludzie;
         z = zwierzeta;
+
 
 
         for(int i = 0; i < l; i++) {
@@ -91,11 +99,13 @@ public class populacja{
 
         pierwszy.rokowania_choroby();
         pierwszy.czas_choroby = 1;
+        
 
         lista_ludzi.set(a, pierwszy);
 
         liczba_ludzi_chorych = 1;
-
+        liczba_ludzi_zyjacych = l;
+        
 
 
         Random r2 = new Random();
@@ -112,7 +122,7 @@ public class populacja{
         lista_zwierzat.set(b, pierwsze);
 
         liczba_zwierzat_chorych = 1;
-
+        liczba_zwierzat_zyjacych = z;
     }
 
 
@@ -123,7 +133,7 @@ public class populacja{
             czlowiek obiekt = lista_ludzi.get(i);
 
 
-            if(obiekt.stan == 1 && kwarantanna){
+            if((obiekt.stan == 1 && kwarantanna) || obiekt.stan == 3){
             }else{
                 obiekt.przemieszczenie();
                 lista_ludzi.set(i, obiekt);
@@ -133,11 +143,9 @@ public class populacja{
 
     void przemieszczeniezwierzat(){
 
-        zwierze obiekt = new zwierze();
-
         for (int i = 0; i < z; i++) {
 
-            obiekt = lista_zwierzat.get(i);
+            zwierze obiekt = lista_zwierzat.get(i);
             obiekt.przemieszczenie();
 
             lista_zwierzat.set(i, obiekt);}}
@@ -146,8 +154,13 @@ public class populacja{
 
     int losowy_czlowiek_indeks(){
 
-        Random r = new Random();
-        int indeks = r.nextInt(l);
+        int indeks;
+
+        do {
+            Random r = new Random();
+            indeks = r.nextInt(l);
+
+        }while(lista_ludzi.get(indeks).stan == 3);
 
         return indeks;
     }
@@ -155,27 +168,15 @@ public class populacja{
 
     int losowe_zwierze_indeks(){
 
-        Random r = new Random();
-        int indeks = r.nextInt(z);
+        int indeks;
+
+        do {
+            Random r = new Random();
+            indeks = r.nextInt(z);
+
+        }while(lista_zwierzat.get(indeks).stan == 3);
 
         return indeks;
-    }
-
-
-
-    void usun_zwierze(int indeks){
-
-        lista_zwierzat.remove(indeks);
-        z = z - 1;
-
-    }
-
-
-    void usun_czlowieka(int indeks){
-
-        lista_ludzi.remove(indeks);
-        l = l - 1;
-
     }
 
 
